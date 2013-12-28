@@ -1,0 +1,25 @@
+{
+  "name": "taikonotatsujin_node_webkit",
+  "version": "0.0.1",
+  "description": "Taiko no tatsujin for node-webkit",
+  "auther": {
+    "name": "ysy,xjk",
+    "email": "yangshiyu.et@gmail.com"
+  },
+  "dependencies": {
+        "cookies": "0.3.6",
+	     "nodegrass":"0.0.1",
+	"mime":"1.2.11",
+	"bufferhelper":"0.2.0"
+  },
+  "readme": "# Taiko no tatsujin for node-webkit",
+  "engines": {
+    "node": ">= 0.8.1"
+  },
+  "main": "index.html",
+  "window": {
+    "frame": false,
+	"toolbar": false
+  }
+  
+}

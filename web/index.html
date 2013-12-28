@@ -1,0 +1,618 @@
+﻿<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  
+  
+  <style>
+  .notes_logo_hide{
+	  transition:all .6s ease-in-out;
+	  -webkit-transition:all .6s ease-in-out;
+	  top:-360px !important;
+  }
+  #notes{
+	  position:absolute;
+	  width:640px;
+	  height:70px;
+	  left:0px;
+	  top:90px;
+	  overflow:hidden;
+  }
+ #notes_bg{
+	 position:absolute;
+	 left:0px;
+	 top:0px;
+	 width:640px;
+	 height:360px;
+	 background-image:url(assert/img/bg.png);
+ }
+ #notes_bg2{
+	 position:absolute;
+	 left:0px;
+	 top:0px;
+	 width:640px;
+	 height:360px;
+	 background-image:url(assert/img/bg2.png);
+ }
+ 
+  #notes_cir{
+	  position:absolute;
+	  left:50px;
+	  top:80px;
+	  margin-top:20px;
+  }
+  #notes_infos{
+	  position:absolute;
+	  left:400px;
+	  top:0px;
+	  background:rgba(255,255,255,0.7);
+	  padding:5px 10px 5px 10px;
+	  border-radius:10px;
+	  font-family:Prime;
+  }
+  #notes_judgement{
+	  position:absolute;
+	  top:80px;
+	  left:55px;
+	  width:45px;
+	  height:32px;
+	  background-image:url(assert/img/judgement.png);
+  }
+  .notes_judgement_no{
+	  opacity:0;
+  }
+  .notes_judgement_ok{
+	  background-position:0px 0px;
+  }
+  .notes_judgement_not{
+	  background-position:0px -64px;
+  }
+  #notes_mob{
+	  position:absolute;
+	  top:179px;
+	  left:0px;
+	  display:none;
+  }
+  @-webkit-keyframes notes_mob_show{
+     0% {
+		 margin-top:5px;
+     }
+	 50% {
+      	`margin-top:0px;
+     }
+	 100% {
+      	`margin-top:5px;
+     }
+   }
+   @keyframes notes_mob_show{
+     0% {
+		 margin-top:5px;
+     }
+	 50% {
+      	`margin-top:0px;
+     }
+	 100% {
+      	`margin-top:5px;
+     }
+   }
+  .notes_mob_show{
+	  display:block !important;
+	 /* -webkit-animation: notes_mob_show .4s linear infinite;
+	  -moz-animation: notes_mob_show .4s linear infinite;
+	  animation:notes_mob_show .4s linear infinite;*/
+  }
+  #notes_cir_fire{
+	  position:absolute;
+	  top:30px;
+	  left:-15px;
+	  width:188px;
+	  height:188px;
+	  background-image:url(assert/img/fire.png);
+	  display:none;
+  }
+  .notes_cir_fire_show_0{
+	  display:block !important;
+	  background-position:0px 0px;
+  }
+  .notes_cir_fire_show_1{
+	  display:block !important;
+	  background-position:188px 0px;
+  }
+  .notes_cir_fire_show_2{
+	  display:block !important;
+	  background-position:376px 0px;
+  }
+  .notes_cir_fire_show_3{
+	  display:block !important;
+	  background-position:564px 0px;
+  }
+  .notes_cir_fire_show_4{
+	  display:block !important;
+	  background-position:752px 0px;
+  }
+  .notes_cir_fire_show_5{
+	  display:block !important;
+	  background-position:940px 0px;
+  }
+  .notes_cir_fire_show_6{
+	  display:block !important;
+	  background-position:1128px 0px;
+  }
+  .notes_cir_fire_show_7{
+	  display:block !important;
+	  background-position:1316px 0px;
+  }
+  #notes_plg{
+	  position:absolute;
+	  width:640px;
+	  height:360px;
+	  overflow:hidden;
+  }
+  #notes_logo{
+	   position:absolute;
+	   left:0px;
+	   top:0px;
+  }
+  #notes_infos_auto,#clode{
+  	cursor:pointer;
+  }
+  </style>
+  <script>
+$SYSVARS=[];
+  </script>
+</head>
+<body ondragstart="return false;">
+<div id="notes_plg">
+    <div id="notes_bg"></div>
+    <div id="notes_bg2"></div>
+    <img id="notes_cir" src="assert/img/cir.png">
+    <div id="notes_cir_fire"></div>
+    <div id="notes"></div>
+    <img id="notes_mob" src="assert/img/mob.png">
+    <div id="notes_infos">
+        <div id="notes_infos_hit">HIT: 0</div>
+        <div id="notes_infos_fail">FAL: 0</div>
+        <div id="notes_infos_ncom">COMMBO: 0</div>
+        <div id="notes_infos_maxcom">MAX COMMBO: 0</div>
+        <div id="notes_infos_auto">Game mode</div>
+    </div>
+    <div id="notes_judgement" class="notes_judgement_no"></div>
+    <img id="notes_logo" src="assert/img/logo.png">
+</div>
+<script src="assert/js/microjs.min.js"></script>
+<script src="assert/js/socket.io.min.js"></script>
+<script src="assert/js/base.js"></script>
+<script>
+var mulist={};
+var $context = new webkitAudioContext();
+muadd("balloon","media/balloon.wav");
+muadd("dong","media/dong.wav");
+muadd("ka","media/ka.wav");
+muadd("c50","media/voice_50combo_p1.wav");
+muadd("c100","media/voice_100combo_p1.wav");
+muadd("c200","media/voice_200combo_p1.wav");
+muadd("c300","media/voice_300combo_p1.wav");
+muadd("c400","media/voice_400combo_p1.wav");
+muadd("c500","media/voice_500combo_p1.wav");
+muadd("c600","media/voice_600combo_p1.wav");
+muadd("c700","media/voice_700combo_p1.wav");
+muadd("c800","media/voice_800combo_p1.wav");
+muadd("c900","media/voice_900combo_p1.wav");
+muadd("c1000","media/voice_1000combo_p1.wav");
+muadd("init","media/don024.m4a.wav");
+muadd("enxiugame","media/don012.m4a.wav");
+muadd("start","media/don019.m4a.wav");
+_f("#notes_infos_auto").addEventListener("click",function(){
+	if(AUTO_MODE){
+		AUTO_MODE=0;
+		this.innerHTML="Game Mode"
+	}else{
+		AUTO_MODE=1;
+		this.innerHTML="AUTO Mode"
+	}
+
+},false)
+var noteexpander=function(ipt){
+	ipt=ipt.split("");
+	if(ipt.length>=32){
+		return ipt.join("");
+	}
+	var opt=[];
+	for(var i=0;i<ipt.length;i++){
+		opt.push(ipt[i]);
+		opt.push(0);
+	} 
+	return noteexpander(opt.join(""))
+}
+
+
+var $tja=SYSLIB_base64.mutilstring(function(){
+/*
+BALLOON:5,5,6,8,13
+SONGVOL:45
+SEVOL:100
+TITLE:Caramelldansen
+LEVEL:4
+BPM:143
+WAVE:only_my_railgun.ogg
+OFFSET:1.5
+BALLOON:30
+COURSE:Oni
+SCOREINIT:590
+SCOREDIFF:130
+SCOREMODE:2
+DEMOSTART:13.5
+#START
+1020201202102020,
+1020201202102020,
+1020201202102020,
+1020201202102022,
+1020201202102020,
+1020201202102020,
+1020201202102020,
+3004,
+#GOGOSTART
+1022001010220010,
+1022002011102020,
+30402212,
+1201203000102020,
+1022001010220010,
+1022002011102020,
+3000400011102020,
+2210221022102210,
+1120120211201220,
+2015000000000000,
+0000000080000000,
+#GOGOEND
+1,
+10210220,
+10210220,
+22021222,
+12123030,
+1001202010221020,
+1001202010221010,
+12121221,
+1111201010001111,
+1101102011112020,
+1101202011112022,
+1101102011112022,
+1101202010102020,
+1101102011212020,
+1101202012112020,
+1101102021112020,
+1000002210000000,
+3003003000004000,
+#GOGOSTART
+1022001010220010,
+1022002011102020,
+30402212,
+1201203000102020,
+1022001010220010,
+1022002011102020,
+30401122,
+1201203000102020,
+1022001010220010,
+1022002011102020,
+30402212,
+1201203000102020,
+1022001010220010,
+1022002011102020,
+3000400011102020,
+2210221022102210,
+1120120211201220,
+2015000000000000,
+0000800030030030,
+0,
+#GOGOEND
+#END
+*/
+})
+var GAME_TJA={
+	title:$tja.match(/TITLE:(.*)/)[1],
+	BPM:$tja.match(/BPM:(.*)/)[1],
+	MSPN:0,
+	WAVE:"songs/"+$tja.match(/WAVE:(.*)/)[1],
+	DEMOSTART:$tja.match(/DEMOSTART:(.*)/)[1],
+	OFFSET:($tja.match(/OFFSET:(.*)/)[1]),
+	LEVEL:$tja.match(/LEVEL:(.*)/)[1],
+	COURSE:$tja.match(/COURSE:(.*)/)[1],
+	SCOREINIT:$tja.match(/SCOREINIT:(.*)/)[1],
+	SCOREDIFF:$tja.match(/SCOREDIFF:(.*)/)[1],
+	SONGVOL:parseInt($tja.match(/SONGVOL:(.*)/)[1]),
+	SEVOL:parseInt($tja.match(/SEVOL:(.*)/)[1]),
+	BALLOON:$tja.match(/BALLOON:(.*)/)[1],
+	DATA:($tja.match(/\#START([.\n\s\S]*)#END/g))[0].split("\n"),
+	NOW_NOTE:[0,0],//tap 0 note 0
+	SCROLL:1,
+	GOGO:0,
+	NOW_ON_NOTE:0,
+	NOW_COMMBO:0,
+	MAX_COMMBO:0,
+	FAIL:0,
+	HIT:0
+}
+muadd("mu",GAME_TJA.WAVE);
+var tmpdata=[];
+for(var i=1;i<GAME_TJA.DATA.length-1;i++){
+	if(GAME_TJA.DATA[i]!=""){
+		var $tpa=GAME_TJA.DATA[i];
+		if(!$tpa.match(/#/)){
+			$tpa=$tpa.replace(/[\s]*/g,"");
+			$tpa=$tpa.replace(",","");
+			$tpa=noteexpander($tpa);
+		}
+		tmpdata.push($tpa);
+	}
+}
+GAME_TJA.DATA=tmpdata;
+GAME_TJA.MSPN=(((60)/parseInt(GAME_TJA.BPM))*1000)/8;
+function play_GAME(){
+	var dely=parseFloat(GAME_TJA.OFFSET)*1000;
+	if(dely>0){
+		play_plying();
+		setTimeout("muplay('mu',GAME_TJA.SONGVOL);",dely);
+	}else if(dely<0){
+		muplay("mu",GAME_TJA.SONGVOL);
+		setTimeout("play_plying();",(-1*dely));
+	}else{
+		muplay("mu",GAME_TJA.SONGVOL);
+		play_plying();
+	}
+	move();
+	
+}
+function play_plying(){
+	if(GAME_TJA.NOW_NOTE[1]>=32){
+		GAME_TJA.NOW_NOTE[0]++;
+		GAME_TJA.NOW_NOTE[1]=0;
+	}
+	if(GAME_TJA.NOW_NOTE[0]>=GAME_TJA.DATA.length){
+		return;
+	}
+	var tpc=GAME_TJA.DATA[GAME_TJA.NOW_NOTE[0]];
+	
+	if(tpc.match(/#/)){
+		var scroll=tpc.match(/#SCROLL (.*)/)
+		if(scroll){
+			GAME_TJA.SCROLL=parseFloat(scroll[1]);
+		}else if(tpc=="#GOGOSTART"){
+			GAME_TJA.GOGO=1;
+		}else if(tpc=="#GOGOEND"){
+			GAME_TJA.GOGO=0;
+		}
+		GAME_TJA.NOW_NOTE[0]++;
+		GAME_TJA.NOW_NOTE[1]=0;
+		setTimeout("play_plying();",1);
+		return;
+	}
+	
+	var nownote=parseInt((tpc).split("")[GAME_TJA.NOW_NOTE[1]]);
+	switch(nownote){
+		case 1:
+			//muplay("dong",GAME_TJA.SEVOL);
+			put_item("dong",20);
+			break;
+		case 3:
+			put_item("big-dong",10);
+			break;
+		case 2: 
+			//muplay("ka",GAME_TJA.SEVOL);
+			put_item("ka",20);
+			break;
+		case 4:
+			put_item("big-ka",10);
+			break;
+	}
+	GAME_TJA.NOW_NOTE[1]++;
+	setTimeout("play_plying();",GAME_TJA.MSPN);
+}
+
+function muadd(ipt,url){
+	
+	mulist[ipt]=url;
+}
+function muplay(name,vol){
+	var $audioBuffer=0;
+	var $source = $context.createBufferSource();
+	var $gainNode = $context.createGainNode();
+	var request = new XMLHttpRequest();
+	var $audioBuffer=0;
+	$source.connect($gainNode);
+    request.open("GET",mulist[name], true);
+    request.responseType = "arraybuffer";
+	request.onload = function() { 
+        $audioBuffer = $context.createBuffer(request.response, false);
+        $source.buffer = $audioBuffer;
+    	$source.looping = false; 
+    }
+	request.send();
+	$gainNode.connect($context.destination);
+	$gainNode.gain.value=vol/100;
+	$source.noteOn(0);
+}
+function put_item(ipt,mtop){
+	var newnode=document.createElement('img');
+	newnode.src="assert/img/"+ipt+".png";
+	newnode.style.position="absolute";
+	newnode.style.left="640px";
+	newnode.style.marginTop=mtop+"px";
+	newnode.name=ipt;
+	newnode.value=0;
+	_f("#notes").appendChild(newnode);
+
+}
+function iplay(ipt){
+	switch(ipt){
+		case "dong":case "big-dong":
+			muplay("dong",GAME_TJA.SEVOL);
+			
+			break;
+		case "ka": case "big-ka":
+			muplay("ka",GAME_TJA.SEVOL);
+			
+			break;
+	}
+}
+AUTO_MODE=1;
+function move(){
+	var nodes=_f("#notes").childNodes;
+	if(nodes){
+		for(var i=0;i<nodes.length;i++){
+			nodes[i].style.left=parseFloat(nodes[i].style.left)-GAME_TJA.SCROLL*3+"px";
+			if(parseFloat(nodes[i].style.left)<70&&nodes[i].value==0){
+				_f("#notes_judgement").className="notes_judgement_no";
+				//nodes[i].src=(nodes[i].src).split(".")[0]+"_cir.png";
+				if(AUTO_MODE){
+					iplay(nodes[i].name);
+				}
+					nodes[i].value=1;
+					GAME_TJA.NOW_ON_NOTE=nodes[i];
+				if(AUTO_MODE){
+					dongka(nodes[i].name);
+				}
+				
+				
+				
+			}
+			if(parseFloat(nodes[i].style.left)<-50){
+				if(nodes[i].value!=2){
+					//GAME_TJA.FAIL++;
+					//GAME_TJA.NOW_COMMBO=0;
+					_f("#notes_infos_fail").innerHTML="FAL: "+GAME_TJA.FAIL;
+					_f("#notes_infos_ncom").innerHTML="COMMBO: "+GAME_TJA.NOW_COMMBO;
+				}
+				_f("#notes").removeChild(nodes[i]);
+			}
+		}
+	}
+	setTimeout("move()",10);
+}
+function tap_dongka(e){
+	var keyCode=e.keyCode;
+	e.returnValue=false;
+	e.preventDefault();
+	switch(keyCode){
+		case 68:
+			var key="dong";
+			break;
+		case 74:
+			var key="ka";
+			break;
+		case 75:
+			var key="big-ka";
+			break;
+		case 83:
+			var key="big-dong";
+			break;
+	}
+	iplay(key);
+	dongka(key);
+}
+function dongka(key){
+	if(GAME_TJA.NOW_ON_NOTE.value!=1||GAME_TJA.NOW_ON_NOTE.name!=key){
+		_f("#notes_judgement").className="notes_judgement_not";
+		GAME_TJA.FAIL++;
+		GAME_TJA.NOW_COMMBO=0;
+		_f("#notes_infos_fail").innerHTML="FAL: "+GAME_TJA.FAIL;
+		_f("#notes_infos_ncom").innerHTML="COMMBO: "+GAME_TJA.NOW_COMMBO;
+		return;
+	}
+	_f("#notes_judgement").className="notes_judgement_ok";
+	GAME_TJA.HIT++;
+	GAME_TJA.NOW_COMMBO++;
+	GAME_TJA.NOW_ON_NOTE.value=2;
+	GAME_TJA.NOW_ON_NOTE.src=(GAME_TJA.NOW_ON_NOTE.src)+"_cir.png";
+	
+	
+	_f("#notes_infos_hit").innerHTML="HIT: "+GAME_TJA.HIT;
+	_f("#notes_infos_ncom").innerHTML="COMMBO: "+GAME_TJA.NOW_COMMBO;
+	if(GAME_TJA.NOW_COMMBO>=GAME_TJA.MAX_COMMBO){
+		GAME_TJA.MAX_COMMBO++;
+		_f("#notes_infos_maxcom").innerHTML="MAX COMMBO: "+GAME_TJA.MAX_COMMBO;
+	}
+	if(GAME_TJA.NOW_COMMBO==50){
+		_f('#notes_mob').className="notes_mob_show";
+	}else if(GAME_TJA.NOW_COMMBO<50){
+		_f('#notes_mob').className="notes_mob_hide";
+	}
+	if(GAME_TJA.NOW_COMMBO==100){
+		notes_cir_fire_show_lc=1;
+		notes_cir_fire_show()
+	}else if(GAME_TJA.NOW_COMMBO<100){
+		notes_cir_fire_show_lc=0;
+		
+	}
+	switch(GAME_TJA.NOW_COMMBO){
+		case 50:
+			muplay("c50",100);
+			break;
+		case 100:
+			muplay("c100",100);
+			break;
+		case 200:
+			muplay("c200",100);
+			break;
+		case 300:
+			muplay("c300",100);
+			break;
+		case 400:
+			muplay("c400",100);
+			break;
+		case 500:
+			muplay("c500",100);
+			break;
+		case 600:
+			muplay("c600",100);
+			break;
+		case 700:
+			muplay("c700",100);
+			break;
+		case 800:
+			muplay("c800",100);
+			break;
+		case 900:
+			muplay("c900",100);
+			break;
+		case 1000:
+			muplay("c1000",100);
+			break;
+	}
+}
+window.addEventListener("keyup",tap_dongka,false);
+notes_cir_fire_show_lc=0;
+function notes_cir_fire_show(){
+	if(notes_cir_fire_show_lc){
+		notes_cir_fire_show_lc++;
+		if(notes_cir_fire_show_lc==8){
+			notes_cir_fire_show_lc=2;
+		}
+		_f('#notes_cir_fire').className="notes_cir_fire_show_"+(notes_cir_fire_show_lc-2);
+		setTimeout("notes_cir_fire_show()",100);
+	}else{
+		_f('#notes_cir_fire').className="notes_cir_fire_show_hide";
+	}
+}
+
+setTimeout(function(){
+	muplay("init",100);
+	setTimeout(function(){
+		muplay("dong",100);
+		muplay("enxiugame",100);
+		setTimeout(function(){
+			_f('#notes_logo').className="notes_logo_hide";
+			muplay("start",100);
+			setTimeout(function(){
+				play_GAME();
+			},3000);
+		},3000);
+	},3000);
+},2000);
+
+</script>
+</body>
+
+</html>
+

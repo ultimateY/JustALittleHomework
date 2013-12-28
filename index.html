@@ -1,0 +1,159 @@
+﻿<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <!-- disable zooming -->
+  <meta name="viewport" content="width=device-width,initial-scale=1.0, user-scalable=0" />
+<script>
+$SYSVARS='';
+var gui = require('nw.gui');
+var win = gui.Window.get();
+win.showDevTools();
+//win.setAlwaysOnTop(1);
+win.setResizable(0);
+win.height=600;
+win.width=900;
+win.x=(screen.availWidth-900)/2;
+win.y=(screen.availHeight-600)/2;
+</script>
+  <style>
+html,body,input,textarea{
+		font-family:"微软雅黑";
+		color: #444;
+		text-shadow: 0px 0px 20px #444;
+}
+body{
+	background: #eee;
+}
+input{
+	color: #444;
+}
+::selection {
+		background:rgba(0,0,0,0.8); 
+		color:#fff;
+	}
+	::-moz-selection {
+		background:rgba(0,0,0,0.8); 
+		color:#fff;
+	}
+	::-webkit-selection {
+		background:rgba(0,0,0,0.8); 
+		color:#fff;
+	}
+	::-webkit-scrollbar {
+    width: 15px;
+}
+ 
+::-webkit-scrollbar-track {
+	background-color:rgba(255,255,255,0.3);
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+    border-radius: 10px;
+}
+ 
+::-webkit-scrollbar-thumb {
+	background-color:rgba(255,255,255,0.6);
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+}
+#close{
+	cursor:pointer;
+	display:inline-block;
+	position: absolute;
+	top:0px;
+	right:0px;
+	color:#444;
+}
+</style>
+
+</head>
+<body>
+<iframe id="playbox" src="" style="position:absolute;top:100px;left:100px;width:700px;height:400px;border:none;"></iframe>
+<center>
+	F - <img src="web/assert/img/dong.png">   D - <img src="web/assert/img/big-dong.png"> 
+	J - <img src="web/assert/img/ka.png">   K - <img src="web/assert/img/big-ka.png">
+</center>
+<div id="close">X</div>
+</body>
+<script type="text/javascript">
+var nodegrass = require('nodegrass');
+var http = require('http');
+var folderPath='web';
+var url = require('url');
+var fs = require("fs");
+var path = require('path');
+var qs = require('querystring');
+var mime=require('mime');
+var Cookies=require('cookies');
+var BufferHelper = require('bufferhelper');
+expiresmaxAge=606024365;   
+var mime=require('mime');
+
+PORT=10086;
+SERVER='127.0.0.1';
+function playgame(song){
+	document.getElementById("playbox").src="http://127.0.0.1:10086/index.html?"+song;
+}
+document.getElementById("close").addEventListener("click",function(){
+	window.opener=null;
+	window.open('','_self');
+	window.close();
+	//gui.App.quit()
+	
+},false);
+
+var server = http.createServer(function (req, res) {
+    try{
+
+		var cookies = new Cookies( req, res);
+		var path = url.parse(req.url);
+		var parameter = qs.parse(path.query);
+		if(path.pathname==""||path.pathname=="/"){
+			path.pathname="/index.html";
+		}
+		var filePath = folderPath + path.pathname;
+			fs.stat(filePath, function (err, stat) {
+						if (err) {
+							res.writeHead(404, {'Content-Type': 'text/plain'});
+							res.end();
+							return;
+						}
+						var expires = new Date();
+						expires.setTime(expires.getTime() + expiresmaxAge*1000);
+						var lastModified = stat.mtime.toUTCString();
+						if (req.headers['ifModifiedSince'] && lastModified == req.headers['ifModifiedSince']) {
+							response.writeHead(304, "Not Modified");
+							res.end();
+						}else{
+							fs.readFile(filePath, "binary", function(err, file) {
+								
+								var mimeType = mime.lookup(filePath);
+								console.log(filePath+":"+mimeType);
+								res.setHeader("Expires", expires.toUTCString());
+								res.setHeader("Cache-Control", "max-age=" + expiresmaxAge);
+								res.setHeader("Last-Modified", lastModified);
+								res.writeHead(200, {'Content-Type': mimeType} );
+								
+								
+								  res.write(file,"binary");
+								  res.end();
+							});
+						}
+					  });
+	}catch(e){
+		//todo: add log
+		console.log(e);
+		res.writeHead(500, {'Content-Type': 'text/plain'});
+    	res.write('500 Internal server error\n');
+    	res.end();
+	}
+});
+server.listen(PORT, SERVER);
+window.onload=function(){
+	setTimeout(function(){
+		playgame("only_my_railgun");
+	},5000)
+}
+</script>
+</html>
+
+
